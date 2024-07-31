@@ -1,26 +1,35 @@
 #!/usr/bin/python3
-""" This module gathers data from an API """
+"""Exports to-do list information for a given employee ID to CSV format."""
 
 import csv
-import json
 import requests
 import sys
 
 
-def get_user_todo_list():
-    employee_id = int(sys.argv[1])
-    url1 = 'https://jsonplaceholder.typicode.com/users/%s' % employee_id
-    url2 = '%s/todos' % url1
-    todo_list = requests.get(url2).json()
-    user = requests.get(url1).json()
-    path = "{}.csv".format(employee_id)
+if __name__ == "__main__":
+    # Get the user ID from the command-line arguments provided to the script
+    user_id = sys.argv[1]
 
-    with open(path, 'w', encoding='utf-8') as f:
-        writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_ALL)
-        for todo in todo_list:
-            writer.writerow([employee_id, user.get('username'),
-                            todo.get('completed'), todo.get('title')])
+    # Define the base URL for the JSON API
+    url = "https://jsonplaceholder.typicode.com/"
 
+    # Fetch user information from the API and
+    #   convert the response to a JSON object
+    user = requests.get(url + "users/{}".format(user_id)).json()
 
-if __name__ == '__main__':
-    get_user_todo_list()
+    # Extract the username from the user data
+    username = user.get("username")
+
+    # Fetch the to-do list items associated with the
+    #   given user ID and convert the response to a JSON object
+    todos = requests.get(url + "todos", params={"userId": user_id}).json()
+
+    # Use list comprehension to iterate over the to-do list items
+    # Write each item's details (user ID, username, completion status,
+    #   and title) as a row in the CSV file
+    with open("{}.csv".format(user_id), "w", newline="") as csvfile:
+        writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+        [writer.writerow(
+            [user_id, username, t.get("completed"), t.get("title")]
+         ) for t in todos]
+

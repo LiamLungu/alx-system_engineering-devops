@@ -1,29 +1,23 @@
-#/usr/bin/python3
-"""
-This script fetches and prints the titles of the top 10 hot posts from a
-given subreddit using the Reddit API.
-"""
+#!/usr/bin/python3
+"""Script that prints out top ten hottest gists
+of a subreddit"""
 
 import requests
 
 
 def top_ten(subreddit):
-    """Fetch and print the titles of the top 10 hot posts from a subreddit."""
+    """Function that fetches top 10 gists"""
     apiUrl = "https://reddit.com/r/{}/hot.json".format(subreddit)
     userAgent = "Mozilla/5.0"
     limits = 10
 
     response = requests.get(
-        apiUrl, headers={"user-agent": userAgent}, params={"limit": limits}, allow_redirects=False)
-    
-    if response.status_code != 200:
+        apiUrl, headers={"user-agent": userAgent}, params={"limit": limits})
+    if not response:
         print('None')
         return
-    
-    try:
-        response = response.json()
-        list_obj = response['data']['children']
-        for obj in list_obj[:limits]:  # Ensures only top 10 are printed
-            print(obj['data']['title'])
-    except Exception as e:
-        print('None')
+    response = response.json()
+    list_obj = response['data']['children']
+    for obj in list_obj:
+        print(obj['data']['title'])
+    return

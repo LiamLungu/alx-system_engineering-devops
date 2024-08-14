@@ -24,7 +24,3 @@ def top_ten(subreddit):
             print(obj['data']['title'])
     except Exception as e:
         print('None')
-
-
-# Example usage
-top_ten('python')
